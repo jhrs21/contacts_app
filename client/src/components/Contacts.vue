@@ -418,6 +418,7 @@ export default {
       this.activeAddContactModal = !this.activeAddContactModal;
       if (this.activeAddContactModal) {
         body.classList.add('modal-open');
+        this.errorMessage = '';
       } else {
         body.classList.remove('modal-open');
       }

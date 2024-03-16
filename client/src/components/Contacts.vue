@@ -324,36 +324,26 @@ export default {
         });
     },
     checkDuplicateEmail(email) {
-      console.log('30');
+      // debugger;
       if (this.editContactForm.id) {
-          console.log('42');
           // If the new email is the same as the current email of the contact being edited
-          if (this.editContactForm.email === email) {
-              console.log('43');
-              return false; // Skip duplicate check
+          if (this.initialEmail !== email) {
+              const filteredContacts = this.contacts.filter(contact => contact.id !== this.editContactForm.id);
+              return filteredContacts.some(contact => contact.email === email);
           }
+      } else {
+        return this.contacts.some(contact => contact.email === email);
       }
-
-      // if (this.editContactForm.id && email === this.editContactForm.email) {
-      //   console.log('40');
-      //   return false; // Email field hasn't been modified, no need to check for duplicates
-      // }
-
-      console.log('50');
-      console.log(this.contacts.some(contact => contact.email === email));
-      // Perform duplicate email validation
-      return this.contacts.some(contact => contact.email === email);
+      return false
     },
     handleAddReset() {
       this.errorMessage = '';
       this.initForm();
     },
     handleAddSubmit() {
-      console.log('10');
-      console.log(this.addContactForm.email);
       if (this.checkDuplicateEmail(this.addContactForm.email)) {
         this.errorMessage = 'Email already exists!';
-        return; // Exit early if email exists
+        return;
       }
       this.errorMessage = '';
       this.toggleAddContactModal();
@@ -367,9 +357,6 @@ export default {
       this.initForm();
     },
     handleEditSubmit() {
-      console.log('20');
-      console.log(this.editContactForm.email);
-      // Validate if the email is unique
       if (this.checkDuplicateEmail(this.editContactForm.email)) {
         this.errorMessage = 'Email already exists!';
         return;
@@ -383,6 +370,7 @@ export default {
           phone_number: this.editContactForm.phone_number,
       };
       this.updateContact(payload, this.editContactForm.id);
+      this.initForm();
     },
     updateContact(payload, contactID) {
       const path = `http://localhost:5001/contacts/${contactID}`;
@@ -410,6 +398,7 @@ export default {
       this.editContactForm.last_name = '';
       this.editContactForm.email = '';
       this.editContactForm.phone_number = '';
+      this.initialEmail = '';
     },
     removeContact(contactID) {
       const path = `http://localhost:5001/contacts/${contactID}`;
@@ -435,6 +424,7 @@ export default {
     },
     toggleEditContactModal(contact) {
         if (contact) {
+            this.initialEmail = contact.email;
             this.editContactForm = contact;
         }
         const body = document.querySelector('body');
@@ -470,7 +460,7 @@ export default {
       this.errorMessage = '';
       this.toggleEditContactModal(null);
       this.initForm();
-      this.getContacts(); // why?
+      this.getContacts();
     },
   },
   created() {
